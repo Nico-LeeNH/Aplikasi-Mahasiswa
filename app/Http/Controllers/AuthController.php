@@ -27,6 +27,15 @@ $user = new User([
 'password' => Hash::make($request->password),
 ]);
 
+$request->validate([
+    'name'=>'required|string|max:255',
+    'email'=>'required|string|email|max:255|unique:users',
+    'password'=>'required|string|min:6',
+]);
+return response()->json([
+    'message' => 'User created successfully',
+    'user' => $user
+]);
 $user->save();
 
 return response()->json(['message' => 'Successfully registered']);
