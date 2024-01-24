@@ -60,7 +60,7 @@ class AuthController extends Controller
             'message' => 'User created successfully',
             'user' => $user
         ]);
-        
+
         // $user->save();
         // return response()->json(['message' => 'Successfully registered']);
     }
