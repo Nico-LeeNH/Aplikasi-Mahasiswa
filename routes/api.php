@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\pengajuanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +23,5 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('signup', [AuthController::class, 'signup']);
 });
+
+Route::post('pengajuan', [pengajuanController::class, 'pengajuan']);

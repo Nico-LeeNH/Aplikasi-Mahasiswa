@@ -13,6 +13,6 @@ class Pengajuan extends Model
     protected $primaryKey = 'id_pengajuan'; 
     public $timestamps = true;
     protected $fillable = [
-        'id_pengajuan', 'id', 'nama', 'nim', 'progam_studi', 'judul_penelitian', 'tangga_pelaksanaan', 'tujuan_tempat_pelaksanaan', 'nomor', 'email', 'upload_file'
+        'id_pengajuan', 'id', 'nama_lengkap', 'nim', 'no_wa', 'email', 'lembaga_mengajukan', 'nomor_surat_pengajuan', 'tgl_surat_pengajuan', 'perihal', 'online_offline', 'judul_penelitian', 'tgl_pelaksanaan', 'tempat_pelaksanaan', 'kota_pelaksanaan', 'upload_file'
     ];
 }
