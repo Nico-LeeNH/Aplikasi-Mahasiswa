@@ -15,10 +15,12 @@ class AuthController extends Controller
     public function login(Request $request)
 {
     $request->validate([
+        // 'name'=>'required|string',
         'email'=>'required|string|email|',
         'password'=>'required|string',
     ]);
-$credentials = $request->only('email', 'password');
+    
+$credentials = $request->only('email','password');
 $token = JWTAuth::attempt($credentials);
         
         if (!$token) {
@@ -27,7 +29,18 @@ $token = JWTAuth::attempt($credentials);
             ], 401);
         }
 
-return response()->json(['token' => $token]);
+        $user = JWTAuth::user();
+
+        return response()->json([
+            'message' => 'User logged in successfully',
+            'user' => [
+                'name' => $user->name,
+                'email' => $user->email,
+                'password'=>$user->password,
+                // Tambahkan informasi lain yang ingin Anda tampilkan
+            ],
+            'token' => $token,
+        ]);
 }
 
 public function signup(Request $request)
