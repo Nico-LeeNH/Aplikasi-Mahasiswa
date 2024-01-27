@@ -9,10 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    
+    // public function up()
+    // {
+    //     Schema::table('users', function (Blueprint $table) {
+    //         $table->string('api_token')->nullable();
+    //     });
+    // }
+
+    public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('api_token')->nullable();
+        Schema::table('pengajuans', function (Blueprint $table) {
+            $table->string('file_pengantar_tujuan')->default('default_value')->change();
         });
     }
 

@@ -16,9 +16,10 @@ class Pengajuan extends Model
         'id',
         'nama_lengkap',
         'nim',
+        'program_studi',
         'no_wa',
         'email',
-        'lembaga_mengajukan',
+        'lembaga_pengajuan',
         'nomor_surat_pengajuan',
         'tgl_surat_pengajuan',
         'perihal',
@@ -27,6 +28,7 @@ class Pengajuan extends Model
         'tgl_pelaksanaan',
         'tempat_pelaksanaan',
         'kota_pelaksanaan',
-        'upload_file'
+        'upload_file',
+        'file_pengantar_tujuan',
     ];
 }

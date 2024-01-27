@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PengajuanController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +17,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/template/{id}', [PengajuanController::class, 'template']);
+Route::get('/convertWordToPdf/{id_pengajuan}', [PengajuanController::class, 'convertWordToPdf']);

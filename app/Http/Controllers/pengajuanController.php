@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pengajuan;
 use Validator;
+use PhpOffice\PhpWord\TemplateProcessor;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\Settings;
 
 class PengajuanController extends Controller
 {
@@ -16,7 +19,8 @@ class PengajuanController extends Controller
             'email' => 'required|string|email|max:255|unique:pengajuans',
             'no_wa' => 'required|numeric',
             'nim' => 'required|numeric',
-            'lembaga_mengajukan' => 'required|string|max:255',
+            'program_studi' => 'required|string|max:255',
+            'lembaga_pengajuan' => 'required|string|max:255',
             'nomor_surat_pengajuan' => 'required|string|max:255',
             'tgl_surat_pengajuan' => 'required|string|max:255',
             'perihal' => 'required|string|max:255',
@@ -38,7 +42,8 @@ class PengajuanController extends Controller
             'email' => $request->email,
             'no_wa' => $request->no_wa,
             'nim' => $request->nim,
-            'lembaga_mengajukan' => $request->lembaga_mengajukan,
+            'program_studi' => $request->program_studi,
+            'lembaga_pengajuan' => $request->lembaga_pengajuan,
             'nomor_surat_pengajuan' => $request->nomor_surat_pengajuan,
             'tgl_surat_pengajuan' => $request->tgl_surat_pengajuan,
             'perihal' => $request->perihal,
@@ -52,8 +57,77 @@ class PengajuanController extends Controller
 
         if ($pengajuan) {
             return response()->json(['status' => 1]);
+
         } else {
             return response()->json(['status' => 0]);
         }
+    }
+
+    public function template(Request $request, $id_pengajuan)
+    {
+        $pengajuan = Pengajuan::find($id_pengajuan);
+        $templateProcessor = new TemplateProcessor(base_path('dokumen/cobaa.docx'));
+
+        if ($pengajuan === null) {
+            // Handle the case where there is no Pengajuan with the given id
+            return response()->json(['message' => 'Pengajuan not found'], 404);
+        }
+
+        foreach ($pengajuan->toArray() as $key => $value) {
+            $templateProcessor->setValue($key, htmlspecialchars($value));
+        }
+        // Set the values in the Word template
+        $templateProcessor->setValue('footer', $pengajuan['nama_lengkap']);
+        $templateProcessor->setValue('nama', strtoupper($pengajuan['nama_lengkap']));
+        $templateProcessor->setValue('email', $pengajuan['email']);
+        $templateProcessor->setValue('nim', $pengajuan['nim']);
+        $templateProcessor->setValue('program_studi', $pengajuan['program_studi']);
+        $templateProcessor->setValue('lembaga_pengajuan', $pengajuan['lembaga_pengajuan']);
+        $templateProcessor->setValue('nomor_surat_pengajuan', $pengajuan['nomor_surat_pengajuan']);
+        $templateProcessor->setValue('tgl_surat_pengajuan', $pengajuan['tgl_surat_pengajuan']);
+        $templateProcessor->setValue('perihal', $pengajuan['perihal']);
+        $templateProcessor->setValue('online_offline', strtolower($pengajuan['online_offline']));
+        $templateProcessor->setValue('judul_penelitian', $pengajuan['judul_penelitian']);
+        $templateProcessor->setValue('tgl_pelaksanaan', $pengajuan['tgl_pelaksanaan']);
+        $templateProcessor->setValue('tempat_pelaksanaan', $pengajuan['tempat_pelaksanaan']);
+        $templateProcessor->setValue('kota_pelaksanaan', $pengajuan['kota_pelaksanaan']);
+
+        // buat namain filenya
+        $filename = $pengajuan['id_pengajuan'] . '_Penelitian_' . $pengajuan['nama_lengkap'] . '.docx';
+        // namain yang wordfilename
+        $wordFileName = public_path('documents/word/' . $filename);
+        //ngesave si wordfilename
+        $templateProcessor->saveAs($wordFileName);
+        //update file_pengantar_tujuan otomatis abis ke save
+        Pengajuan::where('id_pengajuan', $pengajuan['id_pengajuan'])->update([
+            'file_pengantar_tujuan' => $wordFileName,
+        ]);
+
+
+        // notif/output kl sukses
+        return response()->json(['message' => 'Successfully created word file']);
+        // return response()->json(['status' => 1]);
+    }
+
+    function convertWordToPdf($wordFileName)
+    {
+        $domPdfPath = base_path('vendor/dompdf/dompdf');
+
+        Settings::setPdfRendererPath($domPdfPath);
+        Settings::setPdfRendererName('DomPDF');
+
+        // Load the Word document
+        $phpWord = IOFactory::load(public_path('documents/word/' . $wordFileName));
+
+        // Create a new PDF writer
+        $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
+
+        // Define the name of the output PDF file
+        $pdfFileName = str_replace('.docx', '.pdf', $wordFileName);
+
+        // Save the PDF file
+        $pdfWriter->save(public_path('documents/pdf/' . $pdfFileName));
+
+        return response()->json(['message' => 'Successfully created word file', 'file' => $pdfFileName]);
     }
 }

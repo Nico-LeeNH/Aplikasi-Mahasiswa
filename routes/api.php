@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\pengajuanController;
+use App\Http\Controllers\PengajuanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,9 +19,12 @@ use App\Http\Controllers\pengajuanController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('signup', [AuthController::class, 'signup']);
 });
 
-Route::post('pengajuan', [pengajuanController::class, 'pengajuan']);
+Route::controller(PengajuanController::class)->group(function () {
+    Route::post('pengajuan', [PengajuanController::class, 'pengajuan']);
+});
