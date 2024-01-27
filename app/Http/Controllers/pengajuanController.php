@@ -8,6 +8,7 @@ use Validator;
 use PhpOffice\PhpWord\TemplateProcessor;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\Settings;
+use Illuminate\Support\Facades\Storage;
 
 class PengajuanController extends Controller
 {
@@ -36,6 +37,11 @@ class PengajuanController extends Controller
             return response()->json(['status' => 0, 'errors' => $validator->errors()], 422);
         }
 
+        $uploadPath = 'dokumen/upload_file';
+
+        $uploadedFile = $request->file('upload_file');
+        $uniqueFileName = uniqid() . '_' . $uploadedFile->getClientOriginalName();
+
         $pengajuan = Pengajuan::create([
             'id' => $request->id,
             'nama_lengkap' => $request->nama_lengkap,
@@ -52,7 +58,7 @@ class PengajuanController extends Controller
             'tgl_pelaksanaan' => $request->tgl_pelaksanaan,
             'tempat_pelaksanaan' => $request->tempat_pelaksanaan,
             'kota_pelaksanaan' => $request->kota_pelaksanaan,
-            'upload_file' => $request->upload_file->store('uploads'),
+            'upload_file' => $uploadedFile->storeAs($uploadPath, $uniqueFileName),
         ]);
 
         if ($pengajuan) {
