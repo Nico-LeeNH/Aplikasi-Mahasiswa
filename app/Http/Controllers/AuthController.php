@@ -48,7 +48,17 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
+            'confirm_password' => 'required|string|same:password'
         ]);
+
+        $password = $request->input('password');
+        $confirm_password = $request->input('confirm_password');
+
+        if ($password !== $confirm_password) {
+            return response()->json([
+                'pesan' => 'Password tidak cocok'
+            ]);
+        }
 
         $user = User::create([
             'name' => $request->name,
