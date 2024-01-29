@@ -72,7 +72,7 @@ class PengajuanController extends Controller
     public function template(Request $request, $id_pengajuan)
     {
         $pengajuan = Pengajuan::find($id_pengajuan);
-        $templateProcessor = new TemplateProcessor(base_path('dokumen/cobaa.docx'));
+        $templateProcessor = new TemplateProcessor(base_path('template/cobaa.docx'));
 
         if ($pengajuan === null) {
             // Handle the case where there is no Pengajuan with the given id
@@ -101,7 +101,7 @@ class PengajuanController extends Controller
         // buat namain filenya
         $filename = $pengajuan['id_pengajuan'] . '_Penelitian_' . $pengajuan['nama_lengkap'] . '.docx';
         // namain yang wordfilename
-        $wordFileName = public_path('documents/word/' . $filename);
+        $wordFileName = storage_path('app/dokumen/word/' . $filename);
         //ngesave si wordfilename
         $templateProcessor->saveAs($wordFileName);
         //update file_pengantar_tujuan otomatis abis ke save
@@ -109,13 +109,12 @@ class PengajuanController extends Controller
             'file_pengantar_tujuan' => $wordFileName,
         ]);
 
-
         // notif/output kl sukses
         return response()->json(['message' => 'Successfully created word file']);
         // return response()->json(['status' => 1]);
     }
 
-    function convertWordToPdf($wordFileName)
+    public function convertWordToPdf($wordFileName)
     {
         $domPdfPath = base_path('vendor/dompdf/dompdf');
 
@@ -123,7 +122,7 @@ class PengajuanController extends Controller
         Settings::setPdfRendererName('DomPDF');
 
         // Load the Word document
-        $phpWord = IOFactory::load(public_path('documents/word/' . $wordFileName));
+        $phpWord = IOFactory::load(storage_path('app/dokumen/word/' . $wordFileName));
 
         // Create a new PDF writer
         $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
@@ -132,7 +131,7 @@ class PengajuanController extends Controller
         $pdfFileName = str_replace('.docx', '.pdf', $wordFileName);
 
         // Save the PDF file
-        $pdfWriter->save(public_path('documents/pdf/' . $pdfFileName));
+        $pdfWriter->save(storage_path('app/dokumen/pdf/' . $pdfFileName));
 
         return response()->json(['message' => 'Successfully created word file', 'file' => $pdfFileName]);
     }
