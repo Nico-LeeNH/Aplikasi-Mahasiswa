@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Pengajuan;
 use Validator;
-use PhpOffice\PhpWord\TemplateProcessor;
-use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\Settings;
+use PDF;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 
 class PengajuanController extends Controller
 {
@@ -62,77 +61,56 @@ class PengajuanController extends Controller
         ]);
 
         if ($pengajuan) {
-            return response()->json(['status' => 1]);
-
+            $this->show($pengajuan->id_pengajuan);
+            // return response()->json(['status' => 1]);
         } else {
             return response()->json(['status' => 0]);
         }
     }
 
-    public function template(Request $request, $id_pengajuan)
+    public function show($id_pengajuan)
     {
-        $pengajuan = Pengajuan::find($id_pengajuan);
-        $templateProcessor = new TemplateProcessor(base_path('template/cobaa.docx'));
+        $pengajuan = Pengajuan::where('id_pengajuan', $id_pengajuan)->first();
 
-        if ($pengajuan === null) {
-            // Handle the case where there is no Pengajuan with the given id
-            return response()->json(['message' => 'Pengajuan not found'], 404);
+        if (!$pengajuan) {
+            return response()->json(['error' => 'Pengajuan not found'], 404);
         }
+        // return response()->json($pengajuan);
+        // return view('pdf', ['pengajuan' => $pengajuan]);
 
-        foreach ($pengajuan->toArray() as $key => $value) {
-            $templateProcessor->setValue($key, htmlspecialchars($value));
+        $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
+            ->loadView('pdf', ['pengajuan' => $pengajuan])
+            ->setPaper('legal', 'potrait');
+        // $pdf->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->loadView('pdf')->stream();
+
+        $data["email"] = "alidzafazah@gmail.com";
+        $data["title"] = "From ItSolutionStuff.com";
+        $data["body"] = "This is Demo";
+        $data["id_pengajuan"] = $pengajuan->id_pengajuan;
+        $data["nama_lengkap"] = $pengajuan->nama_lengkap;
+
+        $Mail = Mail::send('email', $data, function ($message) use ($data, $pdf) {
+            $message->to($data["email"])
+                ->subject($data["title"])
+                ->attachData($pdf->output(), $data['id_pengajuan'] . ' - ' . $data['nama_lengkap'] . '.pdf');
+        });
+
+        // $uploadPath = 'dokumen/upload_file';
+
+        // $uploadedFile = $request->file('upload_file');
+        // $uniqueFileName = 'pengantar' . uniqid() . '_' . $uploadedFile->getClientOriginalName();
+
+        // $pdf = PDF::loadView('pdf', compact('bills', 'today'));
+
+        // $content = $pdf->download()->getOriginalContent();
+        // Storage::put('public/bills/bubla.pdf', $content);
+
+        if ($Mail) {
+            return response()->json(['status' => 1]);
+        } else {
+            return response()->json(['status' => 0]);
         }
-        // Set the values in the Word template
-        $templateProcessor->setValue('footer', $pengajuan['nama_lengkap']);
-        $templateProcessor->setValue('nama', strtoupper($pengajuan['nama_lengkap']));
-        $templateProcessor->setValue('email', $pengajuan['email']);
-        $templateProcessor->setValue('nim', $pengajuan['nim']);
-        $templateProcessor->setValue('program_studi', $pengajuan['program_studi']);
-        $templateProcessor->setValue('lembaga_pengajuan', $pengajuan['lembaga_pengajuan']);
-        $templateProcessor->setValue('nomor_surat_pengajuan', $pengajuan['nomor_surat_pengajuan']);
-        $templateProcessor->setValue('tgl_surat_pengajuan', $pengajuan['tgl_surat_pengajuan']);
-        $templateProcessor->setValue('perihal', $pengajuan['perihal']);
-        $templateProcessor->setValue('online_offline', strtolower($pengajuan['online_offline']));
-        $templateProcessor->setValue('judul_penelitian', $pengajuan['judul_penelitian']);
-        $templateProcessor->setValue('tgl_pelaksanaan', $pengajuan['tgl_pelaksanaan']);
-        $templateProcessor->setValue('tempat_pelaksanaan', $pengajuan['tempat_pelaksanaan']);
-        $templateProcessor->setValue('kota_pelaksanaan', $pengajuan['kota_pelaksanaan']);
-
-        // buat namain filenya
-        $filename = $pengajuan['id_pengajuan'] . '_Penelitian_' . $pengajuan['nama_lengkap'] . '.docx';
-        // namain yang wordfilename
-        $wordFileName = storage_path('app/dokumen/word/' . $filename);
-        //ngesave si wordfilename
-        $templateProcessor->saveAs($wordFileName);
-        //update file_pengantar_tujuan otomatis abis ke save
-        Pengajuan::where('id_pengajuan', $pengajuan['id_pengajuan'])->update([
-            'file_pengantar_tujuan' => $wordFileName,
-        ]);
-
-        // notif/output kl sukses
-        return response()->json(['message' => 'Successfully created word file']);
-        // return response()->json(['status' => 1]);
-    }
-
-    public function convertWordToPdf($wordFileName)
-    {
-        $domPdfPath = base_path('vendor/dompdf/dompdf');
-
-        Settings::setPdfRendererPath($domPdfPath);
-        Settings::setPdfRendererName('DomPDF');
-
-        // Load the Word document
-        $phpWord = IOFactory::load(storage_path('app/dokumen/word/' . $wordFileName));
-
-        // Create a new PDF writer
-        $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
-
-        // Define the name of the output PDF file
-        $pdfFileName = str_replace('.docx', '.pdf', $wordFileName);
-
-        // Save the PDF file
-        $pdfWriter->save(storage_path('app/dokumen/pdf/' . $pdfFileName));
-
-        return response()->json(['message' => 'Successfully created word file', 'file' => $pdfFileName]);
+        
+        // return $pdf;
     }
 }

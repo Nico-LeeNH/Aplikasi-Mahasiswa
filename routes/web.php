@@ -18,5 +18,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/template/{id}', [PengajuanController::class, 'template']);
-Route::get('/convertWordToPdf/{id_pengajuan}', [PengajuanController::class, 'convertWordToPdf']);
+Route::get('/show/{id_pengajuan}', [PengajuanController::class, 'show']);
