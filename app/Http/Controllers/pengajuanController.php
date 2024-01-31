@@ -81,36 +81,36 @@ class PengajuanController extends Controller
         $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
             ->loadView('pdf', ['pengajuan' => $pengajuan])
             ->setPaper('legal', 'potrait');
-        // $pdf->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->loadView('pdf')->stream();
 
-        $data["email"] = "alidzafazah@gmail.com";
-        $data["title"] = "From ItSolutionStuff.com";
-        $data["body"] = "This is Demo";
+        // Define the file path
+        $filePath = 'dokumen/pdf/' . $pengajuan->id_pengajuan . ' - '. $pengajuan->nama_lengkap . '.pdf';
+
+        // Save PDF file
+        Storage::put($filePath, $pdf->output());
+
+        // to database
+        $pengajuan->file_pengantar_tujuan = $filePath;
+        $pengajuan->save();
+
+        $data["email"] = "alidzafazah@gmail.com"; //isi pake email admin yang dituju
+        $data["title"] = "Dari: " . $pengajuan->nama_lengkap ." ". $pengajuan->email; 
         $data["id_pengajuan"] = $pengajuan->id_pengajuan;
         $data["nama_lengkap"] = $pengajuan->nama_lengkap;
+        $data["upload_file"] = $pengajuan->upload_file;
 
         $Mail = Mail::send('email', $data, function ($message) use ($data, $pdf) {
             $message->to($data["email"])
                 ->subject($data["title"])
-                ->attachData($pdf->output(), $data['id_pengajuan'] . ' - ' . $data['nama_lengkap'] . '.pdf');
+                ->attach(storage_path('app/' . $data["upload_file"])) // Attach the uploaded file
+                ->attachData($pdf->output(), $data['id_pengajuan'] . ' _ ' . $data['nama_lengkap'] . '.pdf');
         });
-
-        // $uploadPath = 'dokumen/upload_file';
-
-        // $uploadedFile = $request->file('upload_file');
-        // $uniqueFileName = 'pengantar' . uniqid() . '_' . $uploadedFile->getClientOriginalName();
-
-        // $pdf = PDF::loadView('pdf', compact('bills', 'today'));
-
-        // $content = $pdf->download()->getOriginalContent();
-        // Storage::put('public/bills/bubla.pdf', $content);
 
         if ($Mail) {
             return response()->json(['status' => 1]);
         } else {
             return response()->json(['status' => 0]);
         }
-        
+
         // return $pdf;
     }
 }

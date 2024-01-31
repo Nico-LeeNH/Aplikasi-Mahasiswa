@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Penelitian {{ $pengajuan['nama_lengkap'] }}</title>
 </head>
 <!-- <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css"> -->
 <!-- <link type="text/css" rel="stylesheet" href="{{ public_path('public/assets/paper.css') }}">
@@ -230,7 +230,7 @@
                         </tr>
                     </table>
 
-                    <p style="font-size:16px;line-height:22px;text-indent: 64px; font-family: Arial, sans-serif;">
+                    <p style="font-size:16px;line-height:22px;text-indent: 64px; font-family: Arial, sans-serif; margin-bottom: 20px;">
                         Dengan ini Cabang Dinas Pendidikan Wilayah Malang (Kota Malang – Kota Batu) memberikan ijin
                         penelitian/survey yang dilaksanakan secara
                         <i>{{ strtolower($pengajuan['online_offline']) }}</i> pada tanggal
@@ -240,11 +240,12 @@
                         berlaku.
                     </p>
 
-                    <p style="font-size:16px;line-height:22px;text-indent: 64px; font-family: Arial, sans-serif;">
+                    <p
+                        style="font-size:16px;line-height:22px;text-indent: 64px; font-family: Arial, sans-serif; margin-bottom:40px;">
                         Demikian atas perhatian dan kerjasamanya disampaikan terima kasih.
                     </p>
 
-                    <table class="ok_table" style="border:none; font-size:16px; font-family: Arial, sans-serif;">
+                    <table class="ok_table" style="font-size:16px; font-family: Arial, sans-serif;">
                         <tr>
                             <td width="250">
                                 &nbsp;
@@ -253,6 +254,7 @@
                                 <p style="text-align:center">Kepala Cabang Dinas Pendidikan
                                     <br>Wilayah Malang
                                     <br>(Kota Malang - Kota Batu)
+                                    <br>
                                     <br>
                                     <br>
                                     <br>
@@ -268,25 +270,21 @@
                     </table>
                 </div>
                 <p style="font-size: 16px; font-family: Arial, sans-serif;">
-                    Tembusan:<br>
-                    Yth. 1. Dekan {{ $pengajuan['lembaga_pengajuan'] }}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Sdr. {{ $pengajuan['nama_lengkap'] }}
+                    <br>
+                    <br>Tembusan:
+                    <br>Yth. 1. Dekan {{ $pengajuan['lembaga_pengajuan'] }}
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Sdr. {{ $pengajuan['nama_lengkap'] }}
                 </p>
                 <hr>
-                <table class="ok_table" style="border:none">
+                <table class="ok_table">
                     <tr>
                         <td style="font-size:12px; font-family: 'Times New Roman', Times, serif;">
-                            <ul>
-                                <li>UU ITE no 11 Tahun 2008 Pasal 5 Ayat 1<br>
-                                    “Informasi Elektronik dan/atau Dokumen Elektronik dan/atau hasil cetaknya merupakan alat bukti hukum yang sah.”
-                                </li>
-                                <li>Dokumen ini telah ditandatangani secara elektronik menggunakan sertifikat elektronik yang diterbitkan BSrE
-                                </li>
-                            </ul>
+                            - UU ITE no 11 Tahun 2008 Pasal 5 Ayat 1
+                            <br>“Informasi Elektronik dan/atau Dokumen Elektronik dan/atau hasil cetaknya merupakan alat bukti hukum yang sah.”
+                            <br>- Dokumen ini telah ditandatangani secara elektronik menggunakan sertifikat elektronik yang diterbitkan BSrE
                         </td>
-                        <td width="150" style="text-align: right">
-                            <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/logo.jpg'))) }}"style="width:110px"
-                                alt="">
+                        <td width="250" style="text-align: right">
+                            <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/logo.jpg'))) }}"style="width:110px" alt="">
                         </td>
                     </tr>
                 </table>

@@ -6,9 +6,12 @@
 </head>
 
 <body>
-    <h1>{{ $title }}</h1>
-    <p>{{ $body }}</p>
-    <p>Thank you</p>
+    <p>
+        Dear Admin,
+        <br>Segera lakukan verifikasi terhadap pengajuan surat pengantar penelitian mahasiswa yang terlampir
+        dan konfirmasi pada email mahasiswa. Terima kasih
+        <br> {{ $title }}
+    </p>
 </body>
 
 </html>
